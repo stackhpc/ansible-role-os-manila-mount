@@ -1,5 +1,6 @@
 ---
-- fail:
+- name: Ensure supported protocol requested
+  fail:
     msg: "Sorry, we only support CEPHFS right now."
   when: os_manila_mount_share_protocol != "CEPHFS"
 
@@ -87,4 +88,13 @@
     fstype: fuse.ceph
     state: mounted
     opts: "_netdev,noatime"
+  become: yes
+
+- name: Ensure mounted directory has correct permissions
+  file:
+    path: "{{ os_manila_mount_path }}"
+    state: directory
+    owner: "{{ os_manila_mount_user }}"
+    group: "{{ os_manila_mount_group }}"
+    mode: "{{ os_manila_mount_mode }}"
   become: yes
