@@ -14,5 +14,5 @@ os_manila_mount_mode: 0775
 os_manila_mount_path: "/home/{{ os_manila_mount_user }}/ceph"
 
 # CEPH specific defaults
-ceph_mount_repo_base: http://download.ceph.com/rpm-jewel/el7
-ceph_mount_conf_path: /etc/ceph
+os_manila_mount_ceph_repo_base: http://download.ceph.com/rpm-jewel/el7
+os_manila_mount_ceph_conf_path: /etc/ceph
