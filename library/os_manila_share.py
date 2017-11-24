@@ -23,7 +23,7 @@ def get_share_client(module):
 def get_share_details(share_client, share_name):
     headers={"X-Openstack-Manila-Api-Version": "2.6"}
     raw_shares = share_client.get(
-        "/shares/detail?name=%s" % "jmfg2-spark-test",
+        "/shares/detail?name=%s" % share_name,
         headers=headers).json()['shares']
     if not raw_shares:
         # TODO - we could create the share, if given enough info
@@ -67,7 +67,7 @@ def get_access_key(share_client, share_id, user):
 
     access_key = None
     for access in raw_access_list:
-        if access['access_to'] == "spark":
+        if access['access_to'] == user:
             access_key = access['access_key']
             break
 
