@@ -1,16 +1,18 @@
 ---
-# Variables you need to set for each env:
+# Only support CephFS right now
+os_manila_mount_share_protocol: CEPHFS
 
-# TODO - move to new prefix, make ceph just one type option
+# Fill these in for each cluster
+os_manila_mount_share_name: my-share
+os_manila_mount_share_user: fakeuser
+os_manila_mount_os_config_name: mycloud
 
-ceph_mount_ceph_access_user: fakeuser
-ceph_mount_manila_share_name: my-share
-ceph_mount_os_config_name: mycloud
-ceph_mount_user: hadoop
-ceph_mount_group: hadoop
+# Some non-terrible defaults for many use cases
+os_manila_mount_user: "{{ os_manila_mount_user }}"
+os_manila_mount_group: "{{ os_manila_mount_user }}"
+os_manila_mount_mode: 0775
+os_manila_mount_path: "/home/{{ os_manila_mount_user }}/ceph"
 
-# Defaults that are probably fine for you
-ceph_mount_path: "/home/{{ ceph_mount_user }}/ceph"
-ceph_mount_mode: 0775
+# CEPH specific defaults
 ceph_mount_repo_base: http://download.ceph.com/rpm-jewel/el7
 ceph_mount_conf_path: /etc/ceph
