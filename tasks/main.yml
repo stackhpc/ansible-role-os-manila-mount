@@ -1,0 +1,85 @@
+---
+- name: Install Ceph Jewl noarch Repo
+  yum_repository:
+    name: ceph-jewl-noarch
+    description: Ceph Jewl Repo
+    baseurl: "{{ ceph_mount_repo_base }}/noarch/"
+    gpgkey: https://git.ceph.com/?p=ceph.git;a=blob_plain;f=keys/release.asc
+  when: "ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7'"
+
+- name: Install Ceph Jewl Repo
+  yum_repository:
+    name: ceph-jewl-arch
+    description: Ceph Jewl Repo
+    baseurl: "{{ ceph_mount_repo_base }}/$basearch/"
+    gpgkey: https://git.ceph.com/?p=ceph.git;a=blob_plain;f=keys/release.asc
+  when: "ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7'"
+
+- name: Install ceph packages for mount and unmount
+  yum: name=epel-release,ceph-common,ceph-fuse,fuse
+  when: "ansible_os_family == 'RedHat' and ansible_distribution_major_version == '7'"
+
+- name: Get manila access info
+  os_manila_share:
+    name: "{{ ceph_mount_manila_share_name }}"
+    user: "{{ ceph_mount_ceph_access_user }}"
+    protocol: CEPHFS
+  register: ceph_mount_manila_share
+  environment:
+      OS_CLOUD: "{{ ceph_mount_os_config_name }}"
+
+- name: Take config from manila
+  set_fact:
+    ceph_mount_ceph_mon_hostlist: "{{ ceph_mount_manila_share.details.host }}"
+    ceph_mount_ceph_access_key: "{{ ceph_mount_manila_share.details.access_key }}"
+    ceph_mount_ceph_mountpoint: "{{ ceph_mount_manila_share.details.path }}"
+
+- name: Ensure ceph conf directory
+  file:
+    path: "{{ ceph_mount_conf_path }}"
+    state: directory
+    mode: 0700
+    owner: root
+    group: root
+
+- name: Configure ceph.conf using ceph_mount_ceph_mon_hostlist
+  template:
+    src: ceph.conf.j2
+    dest: "{{ ceph_mount_conf_path }}/ceph.conf"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Add user keyring with ceph_mount_ceph_access_key
+  template:
+    src: keyring.j2
+    dest: "{{ ceph_mount_conf_path }}/{{ ceph_mount_ceph_access_user }}.keyring"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Ensure mount directory exists
+  file:
+    path: "{{ ceph_mount_path }}"
+    state: directory
+    owner: "{{ ceph_mount_user }}"
+    group: "{{ ceph_mount_group }}"
+    mode: "{{ ceph_mount_mode }}"
+
+# Using _netdev as a filesystem option prevents the mount from blocking early boot
+# before networking is initialised
+- name: Mount the home directory from the Ceph cluster
+  mount:
+    path: "{{ ceph_mount_path }}"
+    src: "id={{ ceph_mount_ceph_access_user }},conf={{ ceph_mount_conf_path}}/ceph.conf,keyring={{ ceph_mount_conf_path }}/{{ ceph_mount_ceph_access_user }}.keyring,client-mountpoint={{ ceph_mount_ceph_mountpoint }}"
+    fstype: fuse.ceph
+    state: mounted
+    opts: "_netdev,noatime"
+
+- name: Ensure user can access mount
+  file:
+    path: "{{ ceph_mount_path }}"
+    state: directory
+    owner: "{{ ceph_mount_user }}"
+    group: "{{ ceph_mount_group }}"
+    mode: "{{ ceph_mount_mode }}"
