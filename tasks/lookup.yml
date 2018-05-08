@@ -4,12 +4,14 @@
     name: "{{ os_manila_mount_share_name }}"
     user: "{{ os_manila_mount_share_user }}"
     protocol: "{{ os_manila_mount_share_protocol }}"
+  environment:
+    OS_CLOUD: "{{ os_manila_mount_os_config_name | default(omit) }}"
   register: os_manila_mount_share
 
 - debug:
-    var: os_manila_mount_share
+    var:  os_manila_mount_share.details
 
-- name: Take config from manila
+- name: Take facts from manila
   set_fact:
     os_manila_mount_host: "{{ os_manila_mount_share.details.host }}"
     os_manila_mount_access_key: "{{ os_manila_mount_share.details.access_key }}"

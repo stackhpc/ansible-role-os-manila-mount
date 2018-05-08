@@ -1,2 +1,2 @@
 ---
-- include "{{ os_manila_mount_action }}.yml"
+- include: "{{ os_manila_mount_action }}.yml"
