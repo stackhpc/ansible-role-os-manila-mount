@@ -46,7 +46,10 @@ def get_share_details(share_client, share_name):
         share['export'] = exports[0]
 
     # Looking for either host:port:path or host:path in export
-    split_export = share['export'].split(":")
+    # CephFS exports take the form mon1:port,mon2:port,mon3:port:path
+    # Take the final item in a comma-separated list to generalise
+    split_export = share['export'].split(",")[-1]
+    split_export = split_export.split(":")
     split_len = len(split_export)
     if split_len == 2 or split_len == 3:
         share['path']= split_export[-1]

@@ -1,0 +1,17 @@
+---
+- name: Get manila access info
+  os_manila_share:
+    name: "{{ os_manila_mount_share_name }}"
+    user: "{{ os_manila_mount_share_user }}"
+    protocol: "{{ os_manila_mount_share_protocol }}"
+  register: os_manila_mount_share
+
+- debug:
+    var: os_manila_mount_share
+
+- name: Take config from manila
+  set_fact:
+    os_manila_mount_host: "{{ os_manila_mount_share.details.host }}"
+    os_manila_mount_access_key: "{{ os_manila_mount_share.details.access_key }}"
+    os_manila_mount_export: "{{ os_manila_mount_share.details.path }}"
+
