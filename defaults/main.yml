@@ -18,6 +18,7 @@ os_manila_mount_path: "/home/{{ os_manila_mount_user }}/ceph"
 # CEPH specific defaults
 os_manila_mount_pkgs_install: True
 os_manila_mount_ceph_repo_base: "http://download.ceph.com/rpm-luminous/el7"
+os_manila_mount_ceph_repo_key: "https://git.ceph.com/?p=ceph.git;a=blob_plain;f=keys/release.asc"
 os_manila_mount_ceph_conf_path: "/etc/ceph"
 
 # Default to FUSE-mounting over kernel FS drvier

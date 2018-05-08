@@ -82,6 +82,8 @@ Ceph package repo and configuration options:
   Defaults to `True`.
 * `os_manila_mount_ceph_repo_base`: Package repository to use.
   Default is `http://download.ceph.com/rpm-luminous/el7`.
+* `os_manila_mount_ceph_repo_key`: Repo signing GPG key.
+  Default is `https://git.ceph.com/?p=ceph.git;a=blob_plain;f=keys/release.asc`
 * `os_manila_mount_ceph_conf_path`: Path to Ceph cluster configuration file.
   Default is `/etc/ceph`.
 * `os_manila_mount_fuse`: Use a FUSE driver for the filesystem, if appropriate.
