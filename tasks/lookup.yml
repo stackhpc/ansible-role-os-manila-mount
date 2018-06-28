@@ -4,8 +4,7 @@
     name: "{{ os_manila_mount_share_name }}"
     user: "{{ os_manila_mount_share_user }}"
     protocol: "{{ os_manila_mount_share_protocol }}"
-  environment:
-    OS_CLOUD: "{{ os_manila_mount_os_config_name | default(omit) }}"
+  environment: "{{ os_manila_mount_credentials }}"
   register: os_manila_mount_share
 
 - debug:

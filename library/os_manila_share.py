@@ -2,6 +2,7 @@
 
 from ansible.module_utils.basic import AnsibleModule
 
+import os
 import os_client_config
 
 
@@ -9,13 +10,21 @@ ANSIBLE_METADATA = {'metadata_version': '1.0'}
 
 
 def get_share_client(module):
-    # NOTE: set OS_CLOUD environment variable to choose from clouds.yaml
-    try:
-        cloud_config = os_client_config.get_config()
-        share_client = cloud_config.get_session_client("sharev2")
-    except Exception, e:
-        module.fail_json(
-            msg="Please check your OpenStack credentials: %s" % e)
+    # NOTE: set OS_CLOUD environment variable to choose a named entry from clouds.yaml
+    if 'OS_CLOUD' in os.environ:
+        try:
+            cloud_config = os_client_config.get_config()
+            share_client = cloud_config.get_session_client("sharev2")
+        except Exception, e:
+            module.fail_json(
+                msg="Please check your OpenStack clouds.yaml[%s] credentials: %s" % (os.environ['OS_CLOUD'],e))
+    else:
+        # OS_CLOUD not set - fall back to other mechanisms for credential handling
+        try: 
+            share_client = os_client_config.session_client("sharev2")
+        except Exception, e:
+            module.fail_json(
+                msg="Please check your OpenStack environment credentials: %s" % e)
 
     return share_client
 
