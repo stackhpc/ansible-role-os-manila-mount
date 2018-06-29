@@ -7,9 +7,6 @@
   environment: "{{ os_manila_mount_credentials }}"
   register: os_manila_mount_share
 
-- debug:
-    var:  os_manila_mount_share.details
-
 - name: Take facts from manila
   set_fact:
     os_manila_mount_host: "{{ os_manila_mount_share.details.host }}"
