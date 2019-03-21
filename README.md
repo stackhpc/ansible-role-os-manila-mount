@@ -32,8 +32,10 @@ Options applicable when working in `lookup` mode:
 * `os_manila_mount_share_user`: User name for mount access check.
 * `os_manila_mount_share_protocol`: Filesystem type to look up.  Currently 
   supported options are `CEPHFS`.
-* `os_manila_mount_os_config_name`: Cloud config name (if applicable),
+* `os_manila_mount_auth_type`: Can be `cloud` (default) or `password.
+* `os_manila_mount_os_config_name`: Cloud config name when auth type is `cloud`,
   as defined in `/etc/openstack/clouds.yaml`
+* `os_manila_mount_auth`: OpenStack credentials when auth type is `password.
 
 The following facts are set by this module:
 
@@ -120,6 +122,7 @@ and then mount a preexisting manila share:
         - { role: stackhpc.os-config,
             os_config_content: "{{ my_cloud_config }}" }
         - { role: stackhpc.os-manila-mount,
+            os_manila_mount_action: "lookup"
             os_manila_mount_os_config_name: "mycloud",
             os_manila_mount_share_name: my-share,
             os_manila_mount_share_user: fakeuser }
@@ -139,32 +142,41 @@ An easy way to this example is:
     ansible-playbook -i "localhost," -c local test.yml
 
 A second example in which the querying of the OpenStack APIs is done once,
-from the local system.  The group of nodes that mount the shared filesystem
-share the data returned:
+from the local system. Note that password based authentication is used in this
+scenario. The group of nodes that mount the shared filesystem share the data
+returned:
 
     ---
     # Query OpenStack Manila for details aob
     - hosts: localhost
       roles:
-	- role: stackhpc.os-manila-mount
-	  os_manila_mount_action: "lookup"
-	  os_manila_mount_share_name: "HomeDirs"
-	  os_manila_mount_share_user: "home"
+        - role: stackhpc.os-manila-mount
+          os_manila_mount_action: "lookup"
+          os_manila_mount_share_name: "HomeDirs"
+          os_manila_mount_share_user: "home"
+          os_manila_mount_auth_type: "password"
+          os_manila_mount_auth:
+            project_domain_name: fake-project-domain
+            user_domain_name: fake-user-domain
+            project_name: fake-project
+            username: fakeuser
+            password: fakepassword
+            auth_url: http://fake-auth-url
 
     - hosts: cluster_ceph_client
       roles:
-	# Perform the mount action on all Ceph client nodes
-	- role: stackhpc.os-manila-mount
-	  os_manila_mount_action: "mount"
-	  os_manila_mount_host: "{{ hostvars['localhost']['os_manila_mount_host'] }}"
-	  os_manila_mount_access_key: "{{ hostvars['localhost']['os_manila_mount_access_key'] }}"
-	  os_manila_mount_export: "{{ hostvars['localhost']['os_manila_mount_export'] }}"
-	  os_manila_mount_share_user: "home"
-	  os_manila_mount_pkgs_install: True
-	  os_manila_mount_path: "/var/mnt/ceph"
-	  os_manila_mount_user: "root"
-	  os_manila_mount_group: "root"
-	  os_manila_mount_fuse: True
+        # Perform the mount action on all Ceph client nodes
+        - role: stackhpc.os-manila-mount
+          os_manila_mount_action: "mount"
+          os_manila_mount_host: "{{ hostvars['localhost']['os_manila_mount_host'] }}"
+          os_manila_mount_access_key: "{{ hostvars['localhost']['os_manila_mount_access_key'] }}"
+          os_manila_mount_export: "{{ hostvars['localhost']['os_manila_mount_export'] }}"
+          os_manila_mount_share_user: "home"
+          os_manila_mount_pkgs_install: True
+          os_manila_mount_path: "/var/mnt/ceph"
+          os_manila_mount_user: "root"
+          os_manila_mount_group: "root"
+          os_manila_mount_fuse: True
 
 
 License
