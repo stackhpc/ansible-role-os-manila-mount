@@ -13,7 +13,7 @@ addons:
 
 install:
   # Install ansible
-  - pip install ansible os-cloud-config
+  - pip install ansible ansible-lint yamllint os-cloud-config
 
   # Check ansible version
   - ansible --version
@@ -22,11 +22,18 @@ install:
   - printf '[defaults]\nroles_path=../' >ansible.cfg
 
   # Compensate for repo name being different to the role
-  - ln -s ansible-role-os-manila-mount/ ../os-manila-mount
+  - ln -s stackhpc.os-manila-mount/ ../os-manila-mount
+
+  # Obtain custom yamllint rules for Ansible
+  - curl -O https://raw.githubusercontent.com/ansible/galaxy/devel/galaxy/importer/linters/yamllint.yaml
 
 script:
   # Basic role syntax check
   - ansible-playbook tests/test.yml -i tests/inventory --syntax-check
+  # Ansible lint
+  - ansible-lint tests/test.yml
+  # YAML lint
+  - yamllint -c yamllint.yaml .
 
 notifications:
   webhooks: https://galaxy.ansible.com/api/v1/notifications/
