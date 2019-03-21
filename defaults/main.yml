@@ -8,6 +8,7 @@ os_manila_mount_share_protocol: CEPHFS
 # Fill these in for each cluster
 os_manila_mount_share_name: my-share
 os_manila_mount_share_user: fakeuser
+os_manila_mount_auth_type: cloud
 os_manila_mount_auth: {}
 
 # Some non-terrible defaults for many use cases
