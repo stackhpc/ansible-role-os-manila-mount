@@ -74,10 +74,9 @@
         src: "none"
         fstype: fuse.ceph
         state: mounted
-        opts: >-
-          _netdev,noatime,ceph.id={{ os_manila_mount_share_user }},
-          ceph.conf={{ os_manila_mount_ceph_conf_path }}/ceph.conf,
-          ceph.client-mountpoint={{ os_manila_mount_export }}
+        opts: "_netdev,noatime,ceph.id={{ os_manila_mount_share_user }},\
+          ceph.conf={{ os_manila_mount_ceph_conf_path }}/ceph.conf,\
+          ceph.client-mountpoint={{ os_manila_mount_export }}"
   when: os_manila_mount_fuse
   become: yes
 
@@ -95,7 +94,8 @@
         src: "{{ os_manila_mount_host }}:{{ os_manila_mount_export }}"
         fstype: ceph
         state: mounted
-        opts: "_netdev,noatime,name={{ os_manila_mount_share_user }},secretfile=/etc/ceph/ceph.client.{{ os_manila_mount_share_user }}.secret"
+        opts: "_netdev,noatime,name={{ os_manila_mount_share_user }},\
+          secretfile=/etc/ceph/ceph.client.{{ os_manila_mount_share_user }}.secret"
         boot: yes
   when: not os_manila_mount_fuse
   become: yes
