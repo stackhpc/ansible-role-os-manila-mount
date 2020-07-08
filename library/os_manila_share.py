@@ -15,14 +15,14 @@ def get_share_client(module):
         try:
             cloud_config = os_client_config.get_config()
             share_client = cloud_config.get_session_client("sharev2")
-        except Exception, e:
+        except Exception as e:
             module.fail_json(
                 msg="Please check your OpenStack clouds.yaml[%s] credentials: %s" % (os.environ['OS_CLOUD'],e))
     else:
         # OS_CLOUD not set - fall back to other mechanisms for credential handling
         try: 
             share_client = os_client_config.session_client("sharev2")
-        except Exception, e:
+        except Exception as e:
             module.fail_json(
                 msg="Please check your OpenStack environment credentials: %s" % e)
 
