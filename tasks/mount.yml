@@ -13,7 +13,7 @@
 - block:
     - name: Add Ceph reposity
       yum_repository:
-        name: centos-ceph-luminous
+        name: "centos-ceph-{{ os_manila_mount_ceph_version }}"
         description: CentOS Storage SIG repo for ceph luminous
         baseurl: "{{ os_manila_mount_ceph_repo_base }}"
         gpgkey: "{{ os_manila_mount_ceph_repo_key | default(omit) }}"
@@ -22,12 +22,9 @@
         name:
           - epel-release
           - ceph-common
-          - ceph-fuse
-          - fuse
   when:
     - ansible_os_family == 'RedHat'
-    - ansible_distribution_major_version == '7'
-    - os_manila_mount_pkgs_install | bool
+    - os_manila_mount_pkgs_install | default(true) | bool
   become: yes
 
 - name: Ensure ceph conf directory exists
@@ -50,61 +47,45 @@
 
 - name: Ensure mount directory exists
   file:
-    path: "{{ os_manila_mount_path }}"
+    path: "{{ value.mount_path }}"
     state: directory
-    owner: "{{ os_manila_mount_user }}"
-    group: "{{ os_manila_mount_group }}"
-    mode: "{{ os_manila_mount_mode }}"
+    owner: "{{ value.mount_user }}"
+    group: "{{ value._mount_group }}"
+    mode: "{{ value.mount_mode }}"
   become: yes
+  loop: "{{ os_manila_mount_configurations | dict2items }}"
 
 # Using _netdev as a filesystem option prevents the mount from blocking early boot
 # before networking is initialised
 
-- block:
-    - name: Add user keyring with os_manila_mount_access_key
-      template:
-        src: keyring.j2
-        dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.client.{{ os_manila_mount_share_user }}.keyring"
-        owner: root
-        group: root
-        mode: 0600
-    - name: FUSE-mount the share from the Ceph cluster
-      mount:
-        path: "{{ os_manila_mount_path }}"
-        src: "none"
-        fstype: fuse.ceph
-        state: mounted
-        opts: "_netdev,noatime,ceph.id={{ os_manila_mount_share_user }},\
-          ceph.conf={{ os_manila_mount_ceph_conf_path }}/ceph.conf,\
-          ceph.client-mountpoint={{ os_manila_mount_export }}"
-  when: os_manila_mount_fuse
+- name: Write Ceph client secret
+  copy:
+    dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.client.{{ os_manila_mount_share_user }}.{{ item.key }}.secret"
+    content: "{{ item.value.access_key }}"
+    mode: 0600
+    owner: root
+    group: root
   become: yes
+  loop: "{{ os_manila_mount_facts | dict2items }}"
 
-- block:
-    - name: Write Ceph client secret
-      copy:
-        dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.client.{{ os_manila_mount_share_user }}.secret"
-        content: "{{ os_manila_mount_access_key }}"
-        mode: 0600
-        owner: root
-        group: root
-    - name: FS-Mount the share from the Ceph cluster
-      mount:
-        path: "{{ os_manila_mount_path }}"
-        src: "{{ os_manila_mount_host }}:{{ os_manila_mount_export }}"
-        fstype: ceph
-        state: mounted
-        opts: "_netdev,noatime,name={{ os_manila_mount_share_user }},\
-          secretfile=/etc/ceph/ceph.client.{{ os_manila_mount_share_user }}.secret"
-        boot: yes
-  when: not os_manila_mount_fuse
+- name: FS-Mount the share from the Ceph cluster
+  mount:
+    path: "{{ os_manila_mount_configurations[item.key].mount_path }}"
+    src: "{{ item.host }}:{{ item.export }}"
+    fstype: ceph
+    state: "{{ os_manila_mount_state }}"
+    opts: "_netdev,noatime,name={{ os_manila_mount_share_user }},\
+      secretfile=/etc/ceph/ceph.client.{{ os_manila_mount_share_user }}.{{ item.key }}.secret"
+    boot: yes
   become: yes
+  loop: "{{ os_manila_mount_facts | dict2items }}"
 
 - name: Ensure mounted directory has correct permissions
   file:
-    path: "{{ os_manila_mount_path }}"
+    path: "{{ value.mount_path }}"
     state: directory
-    owner: "{{ os_manila_mount_user }}"
-    group: "{{ os_manila_mount_group }}"
-    mode: "{{ os_manila_mount_mode }}"
+    owner: "{{ value.mount_user }}"
+    group: "{{ value.mount_group }}"
+    mode: "{{ value.mount_mode }}"
   become: yes
+  loop: "{{ os_manila_mount_configurations | dict2items }}"

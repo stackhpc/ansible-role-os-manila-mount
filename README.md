@@ -27,21 +27,22 @@ OpenStack APIs.
 
 Options applicable when working in `lookup` mode:
 
-* `os_manila_mount_share_name`: Name in Manila for the share.  This name is also
-  used in the output of `manila list`.
 * `os_manila_mount_share_user`: User name for mount access check.
 * `os_manila_mount_share_protocol`: Filesystem type to look up.  Currently 
   supported options are `CEPHFS`.
 * `os_manila_mount_auth_type`: Can be `cloud` (default) or `password.
 * `os_manila_mount_os_config_name`: Cloud config name when auth type is `cloud`,
   as defined in `/etc/openstack/clouds.yaml`
-* `os_manila_mount_auth`: OpenStack credentials when auth type is `password.
+* `os_manila_mount_auth`: OpenStack credentials when auth type is `password.  
+* `os_manila_mount_configurations`: Mapping-of-mappings describing each share to mount. Keys are the Manila name for the share (as in output of `manila list`). Values may be empty maps in this mode.
+
 
 The following facts are set by this module:
 
-* `os_manila_mount_host`: The server to contact for mounting the share.
-* `os_manila_mount_export`: The path on the server from which the share is exported.
-* `os_manila_mount_access_key`: The secret to use when mounting the share.
+* `os_manila_mount_facts`: Mapping of mappings where keys are the Manila name for the share and values are mappings containing keys:
+  * `host`: The server to contact for mounting the share.
+  * `export`: The path on the server from which the share is exported.
+  * `access_key`: The secret to use when mounting the share.
 
 Mount mode
 ==========
@@ -50,46 +51,26 @@ Mount mode
 gathered the required facts) and performs the mount action.  If `lookup` has not
 previously been invoked, access to the OpenStack APIs will be required.
 
-Options applicable when working in `mount` mode when a lookup has not previously
-been performed:
+When working in `mount` mode when a lookup has not previously been performed, the options applicable in lookup mode as above are also applicable.
 
-* `os_manila_mount_share_name`: Name in Manila for the share.  This name is also
-  used in the output of `manila list`.
-* `os_manila_mount_share_user`: Cluster user name for mount access check,
-  and subsequent mount operation.
-* `os_manila_mount_share_protocol`: Filesystem type to look up.  Currently 
-  supported options are `CEPHFS`.
-* `os_manila_mount_os_config_name`: Cloud config name (if applicable),
-  as defined in `/etc/openstack/clouds.yaml`
+In either case, the following key/value pairs must be set in the mappings in `os_manila_mount_configurations`:
 
-If a Manila lookup has previously been performed and facts gathered, the
-following are required:
-
-* `os_manila_mount_host`: The server to contact for mounting the share.
-* `os_manila_mount_export`: The path on the server from which the share is exported.
-* `os_manila_mount_access_key`: The secret to use when mounting the share.
-
-Additional parameters are required in both cases:
-
-* `os_manila_mount_path`: Defaults to "/home/{{ os_manila_mount_user }}/ceph"
-
-A number of additional parameters are optional:
-
-* `os_manila_mount_user`: User name for which the mount point should be owned.
-* `os_manila_mount_group`: Group for which the mount point should be owned
+* `mount_path`: Mount point on the client for this share.
+* `mount_user`: User by which the mount point should be owned.
+* `mount_group`: Group by which the mount point should be owned
 
 Ceph package repo and configuration options:
 
+* `os_manila_mount_ceph_version`: Version of Ceph client package to install. Default `octopus`.
+* `os_manila_mount_state`: State of mounts, default `mounted`, See Ansible `mount` module parameter `state` for options.
 * `os_manila_mount_pkgs_install`: Install repos and client packages needed for Ceph?
   Defaults to `True`.
 * `os_manila_mount_ceph_repo_base`: Package repository to use.
-  Default is `http://download.ceph.com/rpm-luminous/el7`.
+  Default is `http://mirror.centos.org/centos/$releasever/storage/x86_64/ceph-{{ os_manila_mount_ceph_version }/`.
 * `os_manila_mount_ceph_repo_key`: Repo signing GPG key.
-  Default is `https://git.ceph.com/?p=ceph.git;a=blob_plain;f=keys/release.asc`
+  Default is `https://raw.githubusercontent.com/CentOS-Storage-SIG/centos-release-storage-common/master/RPM-GPG-KEY-CentOS-SIG-Storage`
 * `os_manila_mount_ceph_conf_path`: Path to Ceph cluster configuration file.
   Default is `/etc/ceph`.
-* `os_manila_mount_fuse`: Use a FUSE driver for the filesystem, if appropriate.
-  Default is `True`.
 
 
 Dependencies
