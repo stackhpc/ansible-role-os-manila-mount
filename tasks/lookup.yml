@@ -10,6 +10,3 @@
   delegate_to: "{{ os_manila_share_lookup_host }}"
   run_once: "{{ os_manila_share_lookup_once | bool }}"
   become: false
-
-- debug:
-    var: os_manila_mount_share_info

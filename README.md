@@ -61,7 +61,12 @@ that, this should be a list of dicts each containing:
   - `host`: Host/port for Ceph mon(s), e.g. `mon1:port,mon2:port,mon3:port`
   - `export`: Exported path.
   - `access_key`: The access key for this share for the `share_user`.
+  **WARNING: This value should be kept secret.**
   - `item`: The relevant dict from `os_manila_mount_shares`.
+
+  By default the result of the lookup is not shown in logs to avoid exposing `access_key`.
+If necessary for debugging, set `no_log=true` to see it. Note that running ansible with
+`-v` will expose `access_key`.
 
 Ceph variables:
 * `os_manila_mount_ceph_version`: Optional. Ceph version string, default `pacific`. From

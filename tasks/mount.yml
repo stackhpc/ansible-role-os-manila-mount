@@ -27,6 +27,8 @@
     group: "{{ item.item.mount_group | default(omit) }}"
     mode: "{{ item.item.mount_mode | default(omit) }}"
   loop: "{{ os_manila_mount_share_info.results }}"
+  loop_control:
+    label: "{{ item.item.share_name }}"
 
 - name: Write Ceph client keyring
   template:
@@ -36,6 +38,8 @@
     owner: root
     group: root
   loop: "{{ os_manila_mount_share_info.results }}"
+  loop_control:
+    label: "{{ item.item.share_name }}"
 
 - name: Mount the Ceph share
   mount:
@@ -46,6 +50,8 @@
     opts: "name={{ item.item.share_user }},{{ (item.item.mount_opts | default(os_manila_mount_opts)) | join(',') }}"
     state: "{{ item.item.mount_state | default(os_manila_mount_state) }}"
   loop: "{{ os_manila_mount_share_info.results }}"
+  loop_control:
+    label: "{{ item.item.share_name }}"
 
 - name: Ensure mounted directory has correct permissions
   file:
@@ -55,4 +61,6 @@
     group: "{{ item.item.mount_group | default(omit)}}"
     mode: "{{ item.item.mount_mode | default(omit) }}"
   loop: "{{ os_manila_mount_share_info.results }}"
+  loop_control:
+    label: "{{ item.item.share_name }}"
   when: "{{ item.item.mount_state | default(os_manila_mount_state) in ['mounted' or 'ephemeral'] }}"
