@@ -6,10 +6,9 @@ os_manila_mount_action: "mount"
 os_manila_mount_share_protocol: CEPHFS
 
 # Fill these in for each cluster
+os_manila_mount_shares: []
 os_manila_mount_share_name: my-share
 os_manila_mount_share_user: fakeuser
-os_manila_mount_auth_type: cloud
-os_manila_mount_auth: {}
 
 # Some non-terrible defaults for many use cases
 os_manila_mount_user: "{{ os_manila_mount_share_user }}"
@@ -18,9 +17,9 @@ os_manila_mount_mode: 0775
 os_manila_mount_path: "/home/{{ os_manila_mount_user }}/ceph"
 
 # CEPH specific defaults
-os_manila_mount_pkgs_install: True
-os_manila_mount_ceph_repo_base: "http://mirror.centos.org/centos/$releasever/storage/x86_64/ceph-luminous/"
-os_manila_mount_ceph_repo_key: "https://raw.githubusercontent.com/CentOS-Storage-SIG/centos-release-storage-common/master/RPM-GPG-KEY-CentOS-SIG-Storage"
+os_manila_mount_ceph_version: pacific # from octopus, alternatively an x.y.z version can be used
+os_manila_mount_ceph_rpm_key: https://download.ceph.com/keys/release.asc
+os_manila_mount_ceph_release_repo: "https://download.ceph.com/rpm-{{ os_manila_mount_ceph_version }}/el{{ ansible_distribution_major_version }}/noarch/ceph-release-1-1.el{{ ansible_distribution_major_version }}.noarch.rpm"
 os_manila_mount_ceph_conf_path: "/etc/ceph"
 
 # Default to FUSE-mounting over kernel FS drvier
