@@ -1,5 +1,6 @@
 # {{ ansible_managed }}
 
-[client]
-	client quota = true
-	mon host = {{ os_manila_mount_host }}
+{% for share in os_manila_mount_share_info.results %}
+[client.{{ share.item.share_user }}]
+mon_host = {{ share.host }}
+{% endfor %}

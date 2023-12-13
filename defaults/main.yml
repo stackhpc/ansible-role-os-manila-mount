@@ -1,26 +1,20 @@
 ---
-# Action to perform with Manila.  Options are lookup, mount.
-os_manila_mount_action: "mount"
-
-# Only support CephFS right now
-os_manila_mount_share_protocol: CEPHFS
 
 # Fill these in for each cluster
 os_manila_mount_shares: []
-os_manila_mount_share_name: my-share
-os_manila_mount_share_user: fakeuser
-
-# Some non-terrible defaults for many use cases
-os_manila_mount_user: "{{ os_manila_mount_share_user }}"
-os_manila_mount_group: "{{ os_manila_mount_user }}"
-os_manila_mount_mode: 0775
-os_manila_mount_path: "/home/{{ os_manila_mount_user }}/ceph"
+os_manila_share_lookup_host: localhost
+os_manila_share_lookup_once: true
+os_manila_mount_state: mounted
+os_manila_mount_opts:
+  - x-systemd.device-timeout=30
+  - x-systemd.mount-timeout=30
+  - noatime
+  - _netdev # prevents mount blocking early boot before networking available
+  - rw
+os_manila_mount_share_info: [] # populated by lookup mode
 
 # CEPH specific defaults
 os_manila_mount_ceph_version: pacific # from octopus, alternatively an x.y.z version can be used
 os_manila_mount_ceph_rpm_key: https://download.ceph.com/keys/release.asc
 os_manila_mount_ceph_release_repo: "https://download.ceph.com/rpm-{{ os_manila_mount_ceph_version }}/el{{ ansible_distribution_major_version }}/noarch/ceph-release-1-1.el{{ ansible_distribution_major_version }}.noarch.rpm"
-os_manila_mount_ceph_conf_path: "/etc/ceph"
-
-# Default to FUSE-mounting over kernel FS drvier
-os_manila_mount_fuse: True
+os_manila_mount_ceph_conf_path: /etc/ceph
