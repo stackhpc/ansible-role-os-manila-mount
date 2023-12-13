@@ -46,7 +46,6 @@
     path: "{{ item.item.mount_path }}"
     src: "{{ item.host }}:{{ item.export }}"
     fstype: ceph
-    state: mounted # TODO:
     opts: "name={{ item.item.share_user }},{{ (item.item.mount_opts | default(os_manila_mount_opts)) | join(',') }}"
     state: "{{ item.item.mount_state | default(os_manila_mount_state) }}"
   loop: "{{ os_manila_mount_share_info.results }}"
