@@ -1,16 +1,17 @@
+---
 - name: Get distribution facts
-  setup:
+  ansible.builtin.setup:
     gather_subset:
       - distribution
 
 - name: Install Ceph rpm key
-  rpm_key:
+  ansible.builtin.rpm_key:
     key: "{{ os_manila_mount_ceph_rpm_key }}"
 
 - name: Install Ceph release repo
-  dnf:
+  ansible.builtin.dnf:
     name: "{{ os_manila_mount_ceph_release_repo }}"
 
 - name: Install Ceph packages
-  dnf:
+  ansible.builtin.dnf:
     name: ceph-common

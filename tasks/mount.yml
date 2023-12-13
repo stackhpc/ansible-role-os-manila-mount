@@ -1,26 +1,26 @@
 ---
 # Perform a lookup if this module has not previously been invoked in that mode.
-- include: lookup.yml
+- ansible.builtin.include: lookup.yml
   when: not os_manila_mount_share_info | length
 
 - name: Ensure Ceph configuration directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ os_manila_mount_ceph_conf_path }}"
     state: directory
-    mode: 0755
+    mode: "0755"
     owner: root
     group: root
 
 - name: Configure ceph.conf using os_manila_mount_host
-  template:
+  ansible.builtin.template:
     src: ceph.conf.j2
     dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.conf"
     owner: root
     group: root
-    mode: 0600
+    mode: "0600"
 
 - name: Ensure mount directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ item.item.mount_path }}"
     state: directory
     owner: "{{ item.item.mount_user | default(omit) }}"
@@ -31,10 +31,10 @@
     label: "{{ item.item.share_name }}"
 
 - name: Write Ceph client keyring
-  template:
+  ansible.builtin.template:
     src: ceph.keyring.j2
     dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.client.{{ item.item.share_user }}.keyring"
-    mode: 0600
+    mode: "0600"
     owner: root
     group: root
   loop: "{{ os_manila_mount_share_info.results }}"
@@ -46,20 +46,20 @@
     path: "{{ item.item.mount_path }}"
     src: "{{ item.host }}:{{ item.export }}"
     fstype: ceph
-    opts: "name={{ item.item.share_user }},{{ (item.item.mount_opts | default(os_manila_mount_opts)) | join(',') }}"
+    opts: name={{ item.item.share_user }},{{ (item.item.mount_opts | default(os_manila_mount_opts)) | join(',') }}
     state: "{{ item.item.mount_state | default(os_manila_mount_state) }}"
   loop: "{{ os_manila_mount_share_info.results }}"
   loop_control:
     label: "{{ item.item.share_name }}"
 
 - name: Ensure mounted directory has correct permissions
-  file:
+  ansible.builtin.file:
     path: "{{ item.item.mount_path }}"
     state: directory
     owner: "{{ item.item.mount_user | default(omit) }}"
-    group: "{{ item.item.mount_group | default(omit)}}"
+    group: "{{ item.item.mount_group | default(omit) }}"
     mode: "{{ item.item.mount_mode | default(omit) }}"
   loop: "{{ os_manila_mount_share_info.results }}"
   loop_control:
     label: "{{ item.item.share_name }}"
-  when: "{{ item.item.mount_state | default(os_manila_mount_state) in ['mounted' or 'ephemeral'] }}"
+  when: item.item.mount_state | default(os_manila_mount_state) in ['mounted' or 'ephemeral']

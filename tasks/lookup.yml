@@ -1,5 +1,4 @@
 ---
-
 - name: Get manila access info
   os_manila_share:
     name: "{{ item.share_name }}"
