@@ -65,7 +65,7 @@ that, this should be a list of dicts each containing:
   - `item`: The relevant dict from `os_manila_mount_shares`.
 
   By default the result of the lookup is not shown in logs to avoid exposing `access_key`.
-If necessary for debugging, set `no_log=true` to see it. Note that running ansible with
+If necessary for debugging, set `no_log=false` to see it. Note that running ansible with
 `-v` will expose `access_key`.
 
 Ceph variables:
