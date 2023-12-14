@@ -71,7 +71,7 @@ If necessary for debugging, set `no_log=false` to see it. Note that running ansi
 Ceph variables:
 * `os_manila_mount_ceph_version`: Optional. Ceph version string, default `pacific`. From
   `octopus` alternatively an `x.y.z` version may be used.
-* `os_manila_mount_ceph_rpm_key`: Optional. URL for Ceph rpm key.
+* `os_manila_mount_ceph_repo_key`: Optional. URL for Ceph repo key.
 * `os_manila_mount_ceph_release_repo`: Optional. URL for Ceph release repo.
 * `os_manila_mount_ceph_conf_path`: Optional. Path for Ceph configuration directory,
 default `/etc/ceph`.

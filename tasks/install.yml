@@ -6,7 +6,7 @@
 
 - name: Install Ceph rpm key
   ansible.builtin.rpm_key:
-    key: "{{ os_manila_mount_ceph_rpm_key }}"
+    key: "{{ os_manila_mount_ceph_repo_key }}"
 
 - name: Install Ceph release repo
   ansible.builtin.dnf:
