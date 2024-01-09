@@ -14,7 +14,7 @@ os_manila_mount_opts:
 os_manila_mount_share_info: [] # populated by lookup mode
 
 # CEPH specific defaults
-os_manila_mount_ceph_version: pacific # from octopus, alternatively an x.y.z version can be used
+os_manila_mount_ceph_version: nautilus # Oldest EL8-compatible version. From octopus an x.y.z version can be specified instead
 os_manila_mount_ceph_repo_key: https://download.ceph.com/keys/release.asc
 os_manila_mount_ceph_release_repo: "https://download.ceph.com/rpm-{{ os_manila_mount_ceph_version }}/el{{ ansible_distribution_major_version }}/\
                                     noarch/ceph-release-1-1.el{{ ansible_distribution_major_version }}.noarch.rpm"
