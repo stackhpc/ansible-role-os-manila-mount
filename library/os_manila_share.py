@@ -56,6 +56,7 @@ def main():
     result['export'] = export_path
     result['access_key'] = rule['access_key']
     result['share_user'] = rule['access_to'] # supports case where user is autodetected
+    result['share_name'] = share_name
     
     # TODO: add more info here?
     module.exit_json(**result)

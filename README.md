@@ -5,15 +5,15 @@ Mount one or more shares created by OpenStack Manila.
 
 Currently only supports:
 - CephFS-protocol shares.
-- Enterprise Linux (RedHat clones)
+- Enterprise Linux (RedHat clones) 8.
 
 Requirements
 ------------
 
 The host running the lookup action (see below) requires the following python packages:
 
-- python-openstackclient
-- python-manilaclient
+- `python-openstackclient`
+- `python-manilaclient`
 
 That host also requires OpenStack credentials and access to the OpenStack APIs.
 
@@ -37,15 +37,17 @@ Role Variables
 containing:
   - `share_name`: Required. Name in Manila for the share ("Name" from `openstack share
   list`).
-  - `share_user`: Optional if share only has one access rule defined. CephX user for
-  access ("Access To" from `openstack share access list <share_name>`).
+  - `share_user`: Optional if share only has one access rule defined, otherwise required.
+  CephX user for access ("Access To" from `openstack share access list <share_name>`).
   - `mount_path`: Required. Directory path to mount the share at (will be created).
   - `mount_user`: Optional. User to mount as (default: become user).
   - `mount_group`: Optional. Group to mount as (default: become user).
-  - `mount_opts`: Optional. List of strings defining mount options. Default is 
+  - `mount_mode`: Optional. Permissions for mounted directory, as for [ansible.builtin.file:mode](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html#parameter-mode)
+  - `mount_opts`: Optional. List of strings defining mount options. Default from
   `os_manila_mount_opts` (i.e. same for all mounts).
-  - `mount_state`: Optional. Mount state, default `os_manila_mount_state` (i.e. same for
+  - `mount_state`: Optional. Mount state, default from `os_manila_mount_state` (i.e. same for
   all mounts).
+
 * `os_manila_share_lookup_host`: Optional. Inventory hostname of host to run lookup on.
 Default `localhost`.
 * `os_manila_share_lookup_once`: Optional. Bool controlling whether to run the lookup
@@ -62,14 +64,12 @@ that, this should be a list of dicts each containing:
   - `export`: Exported path.
   - `access_key`: The access key for this share for the `share_user`.
   **WARNING: This value should be kept secret.**
-  - `item`: The relevant dict from `os_manila_mount_shares`.
 
-  By default the result of the lookup is not shown in logs to avoid exposing `access_key`.
-If necessary for debugging, set `no_log=false` to see it. Note that running ansible with
+  If necessary for debugging, set `no_log=false` to see this variable. Note that running ansible with
 `-v` will expose `access_key`.
 
 Ceph variables:
-* `os_manila_mount_ceph_version`: Optional. Ceph version string, default `pacific`. From
+* `os_manila_mount_ceph_version`: Optional. Ceph version string, default `nautilus`. From
   `octopus` alternatively an `x.y.z` version may be used.
 * `os_manila_mount_ceph_repo_key`: Optional. URL for Ceph repo key.
 * `os_manila_mount_ceph_release_repo`: Optional. URL for Ceph release repo.
@@ -105,7 +105,7 @@ An easy way to run this example with both the lookup and the mount done on local
     pip install -U ansible python-openstackclient python-manilaclient
     ansible-galaxy install stackhpc.os-manila-mount
 
-    ansible-playbook -c local test.yml
+    ansible-playbook -v local test.yml
 
 License
 -------
