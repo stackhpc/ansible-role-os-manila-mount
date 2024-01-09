@@ -11,8 +11,7 @@ def main():
     module = AnsibleModule(
         argument_spec = dict(
             name=dict(required=True, type='str'),
-            user=dict(required=True, type='str'),
-            # passthrough=dict(optional=False, type='dict'),
+            user=dict(required=False, type='str'),
         ),
         supports_check_mode=False
     )
@@ -37,25 +36,27 @@ def main():
 
     # find rule:
     access_rules = list(conn.share.access_rules(share))
-    rules = [v for v in access_rules if v.access_to == user]
-    if len(rules) == 0:
-        module.fail_json("No rules found with 'access_to=%s' for share named %r" % (access_to, share_name))
-    if len(rules) != 1:
-        module.fail_json("Multiple rules found with 'access_to=%s' for share named %r" % (access_to, share_name))
-    rule = rules[0]
+    if len(access_rules) == 0:
+        module.fail_json("No rules for share named %r" % share_name)
+    if user is None:
+        if len(access_rules) == 1:
+            rule = access_rules[0]
+        else:
+            module.fail_json("Multiple rules found for share named %r but no user specified" % share_name)
+    else:
+        rules = [v for v in access_rules if v.access_to == user]
+        if len(rules) == 0:
+            module.fail_json("No rules found with 'access_to=%s' for share named %r" % (access_to, share_name))
+        if len(rules) != 1:
+            module.fail_json("Multiple rules found with 'access_to=%s' for share named %r" % (access_to, share_name))
+        rule = rules[0]
 
     # Put required parameters at top level in result to make loops easy:
     result['host'] = host
     result['export'] = export_path
     result['access_key'] = rule['access_key']
+    result['share_user'] = rule['access_to'] # supports case where user is autodetected
     
-    # # Add passthrough parameters to make loops easy:
-    # for k, v in passthrough.items():
-    #     if k in result:
-    #         module.fail_json("Passthrough parameter %r overwrites discovered parameter from share named %r" % (k, share_name))
-    #     result[k] = v
-
-    # result['rule'] = rule
     # TODO: add more info here?
     module.exit_json(**result)
 

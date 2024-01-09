@@ -33,7 +33,7 @@
 - name: Write Ceph client keyring
   ansible.builtin.template:
     src: ceph.keyring.j2
-    dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.client.{{ item.item.share_user }}.keyring"
+    dest: "{{ os_manila_mount_ceph_conf_path }}/ceph.client.{{ item.share_user }}.keyring"
     mode: "0600"
     owner: root
     group: root
@@ -46,7 +46,7 @@
     path: "{{ item.item.mount_path }}"
     src: "{{ item.host }}:{{ item.export }}"
     fstype: ceph
-    opts: name={{ item.item.share_user }},{{ (item.item.mount_opts | default(os_manila_mount_opts)) | join(',') }}
+    opts: name={{ item.share_user }},{{ (item.item.mount_opts | default(os_manila_mount_opts)) | join(',') }}
     state: "{{ item.item.mount_state | default(os_manila_mount_state) }}"
   loop: "{{ os_manila_mount_share_info.results }}"
   loop_control:

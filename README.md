@@ -37,8 +37,8 @@ Role Variables
 containing:
   - `share_name`: Required. Name in Manila for the share ("Name" from `openstack share
   list`).
-  - `share_user`: Required. CephX user for access ("Access To" from `openstack share
-  access list <share_name>`).
+  - `share_user`: Optional if share only has one access rule defined. CephX user for
+  access ("Access To" from `openstack share access list <share_name>`).
   - `mount_path`: Required. Directory path to mount the share at (will be created).
   - `mount_user`: Optional. User to mount as (default: become user).
   - `mount_group`: Optional. Group to mount as (default: become user).
