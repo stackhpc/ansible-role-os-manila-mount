@@ -42,7 +42,7 @@
     label: "{{ item.share_name }}"
 
 - name: Mount the Ceph share
-  mount:
+  ansible.posix.mount:
     path: "{{ item[0].mount_path }}"
     src: "{{ item[1].host }}:{{ item[1].export }}"
     fstype: ceph
