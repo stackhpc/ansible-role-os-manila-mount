@@ -4,14 +4,26 @@
     gather_subset:
       - distribution
 
-- name: Install Ceph rpm key
-  ansible.builtin.rpm_key:
-    key: "{{ os_manila_mount_ceph_repo_key }}"
+- block:
+  - name: Install Ceph rpm key
+    ansible.builtin.rpm_key:
+      key: "{{ os_manila_mount_ceph_repo_key }}"
 
-- name: Install Ceph release repo
-  ansible.builtin.dnf:
-    name: "{{ os_manila_mount_ceph_release_repo }}"
+  - name: Install Ceph release repo (dnf)
+    ansible.builtin.dnf:
+      name: "{{ os_manila_mount_ceph_release_repo }}"
+  when: ansible_distribution == 'Rocky'
+
+- block:
+  - name: Install Ceph apt key
+    ansible.builtin.apt_key:
+      url: "{{ os_manila_mount_ceph_repo_key }}"
+
+  - name: Install Ceph release repo (apt)
+    ansible.builtin.apt_repository:
+      repo: "deb {{ os_manila_mount_ceph_release_repo }} {{ ansible_distribution_release }} main"
+  when: ansible_distribution == 'Ubuntu'
 
 - name: Install Ceph packages
-  ansible.builtin.dnf:
+  ansible.builtin.package:
     name: ceph-common
