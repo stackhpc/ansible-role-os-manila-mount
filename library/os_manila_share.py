@@ -54,6 +54,7 @@ def main():
     result['host'] = host
     result['export'] = export_path
     result['access_key'] = rule['access_key']
+    result['access_level'] = rule['access_level']
     result['share_user'] = rule['access_to'] # supports case where user is autodetected
     result['share_name'] = share_name
 
