@@ -4,7 +4,7 @@ jobs:
   lint:
     runs-on: ubuntu-22.04
     steps:
-     - name: Check out the codebase.
+      - name: Check out the codebase
         uses: actions/checkout@v4
       
       - name: Set up Python 3.9
