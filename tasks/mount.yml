@@ -1,6 +1,6 @@
 ---
 # Perform a lookup if this module has not previously been invoked in that mode.
-- ansible.builtin.include: lookup.yml
+- ansible.builtin.include_tasks: lookup.yml
   when: not os_manila_mount_share_info | length
 
 - name: Ensure Ceph configuration directory exists
@@ -42,7 +42,7 @@
     label: "{{ item.share_name }}"
 
 - name: Mount the Ceph share
-  mount:
+  ansible.posix.mount:
     path: "{{ item[0].mount_path }}"
     src: "{{ item[1].host }}:{{ item[1].export }}"
     fstype: ceph

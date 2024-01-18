@@ -2,7 +2,7 @@
 - name: Get manila access info
   os_manila_share:
     name: "{{ item.share_name }}"
-    user: "{{ item.share_user | default(omit)}}"
+    user: "{{ item.share_user | default(omit) }}"
   register: _os_manila_mount_lookup
   loop: "{{ os_manila_mount_shares }}"
   no_log: "{{ no_log | default(true) }}"
