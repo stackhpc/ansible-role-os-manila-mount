@@ -1,5 +1,6 @@
 # {{ ansible_managed }}
 
+{% if os_manila_mount_share_info | length > 0 %}
 [client]
-	client quota = true
-	mon host = {{ os_manila_mount_host }}
+mon_host = {{ os_manila_mount_share_info[0].host }}
+{% endif %}

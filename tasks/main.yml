@@ -1,3 +1,7 @@
 ---
-- name: "Include {{ os_manila_mount_action }} tasks"
-  include_tasks: "{{ os_manila_mount_action }}.yml"
+- name: Include install tasks
+  ansible.builtin.include_tasks: install.yml
+- name: Include lookup tasks
+  ansible.builtin.include_tasks: lookup.yml
+- name: Include mount tasks
+  ansible.builtin.include_tasks: mount.yml

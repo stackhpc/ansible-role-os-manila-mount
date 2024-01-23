@@ -1,183 +1,112 @@
 stackhpc.os-manila-mount
 ========================
 
-[![Build Status](https://www.travis-ci.org/stackhpc/ansible-role-os-manila-mount.svg?branch=master)](https://www.travis-ci.org/stackhpc/ansible-role-os-manila-mount)
+Mount one or more shares created by OpenStack Manila.
 
-Mount a share created by OpenStack Manila.
-
-Currently only supports CephFS. We have plans to add GlusterFS.
+Currently only supports:
+- CephFS-protocol shares.
+- Enterprise Linux (RedHat clones) 8.
 
 Requirements
 ------------
 
-This role only requires Ansible.
+The host running the lookup action (see below) requires the following python packages:
+
+- `openstacksdk`
+- `python-openstackclient`
+- `python-manilaclient`
+
+That host also requires OpenStack credentials and access to the OpenStack APIs.
+
+Role Taskfiles
+--------------
+
+The default `tasks/main.yml` task file will install packages, lookup Manila share
+details, create client configuration and mount shares. However it is possible to
+separate out these actions using specific task files:
+- `install.yml`: Only install release repo and packages.
+- `lookup.yml`: Only lookup share details.
+- `mount.yml`: Only create client configuration and mount shares.
+
+This may be useful for image build, or for situations where it is undesirable to
+dynamically retrieve share information during mount.
 
 Role Variables
 --------------
 
-* `os_manila_mount_action`: Action to perform with Manila.  Options are
-  `lookup`, `mount`.  Default is `mount`.
+* `os_manila_mount_shares`: List of dicts defining the shares to mount, each
+containing:
+  - `share_name`: Required. Name in Manila for the share ("Name" from `openstack share
+  list`).
+  - `share_user`: Optional if share only has one access rule defined, otherwise required.
+  CephX user for access ("Access To" from `openstack share access list <share_name>`).
+  - `mount_path`: Required. Directory path to mount the share at (will be created).
+  - `mount_user`: Optional. User to mount as (default: become user).
+  - `mount_group`: Optional. Group to mount as (default: become user).
+  - `mount_mode`: Optional. Permissions for mounted directory, as for [ansible.builtin.file:mode](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html#parameter-mode)
+  - `mount_opts`: Optional. List of strings defining mount options. Default from
+  `os_manila_mount_opts` (i.e. same for all mounts).
+  - `mount_state`: Optional. Mount state, default from `os_manila_mount_state` (i.e. same for
+  all mounts).
 
-Lookup mode
-===========
+* `os_manila_share_lookup_host`: Optional. Inventory hostname of host to run lookup on.
+Default `localhost`.
+* `os_manila_share_lookup_once`: Optional. Bool controlling whether to run the lookup
+task on only one host. Default is `true` for speed, but if 
+`os_manila_mount_shares` varies between hosts in the play this must be set to `false`.
 
-`lookup` mode retrieves share server address and other data, as a fact-gathering
-exercise.  This operation must be performed on hosts that have access to the
-OpenStack APIs.
+* `os_manila_mount_state`: Optional. As for `state` of [ansible.posix.mount](https://docs.ansible.com/ansible/latest/collections/ansible/posix/mount_module.html). Default `mounted`.
+* `os_manila_mount_opts`: Optional. List of strings defining default mount options
+(see `defaults/main.yml`).
 
-Options applicable when working in `lookup` mode:
+* `os_manila_mount_share_info`: Automatically populated by lookup task. If not running
+that, this should be a list of dicts each containing:
+  - `host`: Host/port for Ceph mon(s), e.g. `mon1:port,mon2:port,mon3:port`
+  - `export`: Exported path.
+  - `access_key`: The access key for this share for the `share_user`.
+  **WARNING: This value should be kept secret.**
 
-* `os_manila_mount_share_name`: Name in Manila for the share.  This name is also
-  used in the output of `manila list`.
-* `os_manila_mount_share_user`: User name for mount access check.
-* `os_manila_mount_share_protocol`: Filesystem type to look up.  Currently 
-  supported options are `CEPHFS`.
-* `os_manila_mount_auth_type`: Can be `cloud` (default) or `password.
-* `os_manila_mount_os_config_name`: Cloud config name when auth type is `cloud`,
-  as defined in `/etc/openstack/clouds.yaml`
-* `os_manila_mount_auth`: OpenStack credentials when auth type is `password.
+  If necessary for debugging, set `no_log=false` to see this variable. Note that running ansible with
+`-v` will expose `access_key`.
 
-The following facts are set by this module:
+Ceph variables:
+* `os_manila_mount_ceph_version`: Optional. Ceph version string, default `nautilus`. From
+  `octopus` alternatively an `x.y.z` version may be used.
+* `os_manila_mount_ceph_repo_key`: Optional. URL for Ceph repo key.
+* `os_manila_mount_ceph_release_repo`: Optional. URL for Ceph release repo.
+* `os_manila_mount_ceph_conf_path`: Optional. Path for Ceph configuration directory,
+default `/etc/ceph`.
 
-* `os_manila_mount_host`: The server to contact for mounting the share.
-* `os_manila_mount_export`: The path on the server from which the share is exported.
-* `os_manila_mount_access_key`: The secret to use when mounting the share.
-
-Mount mode
-==========
-
-`mount` mode retrieves share data (if a previous invocation of `lookup` had not
-gathered the required facts) and performs the mount action.  If `lookup` has not
-previously been invoked, access to the OpenStack APIs will be required.
-
-Options applicable when working in `mount` mode when a lookup has not previously
-been performed:
-
-* `os_manila_mount_share_name`: Name in Manila for the share.  This name is also
-  used in the output of `manila list`.
-* `os_manila_mount_share_user`: Cluster user name for mount access check,
-  and subsequent mount operation.
-* `os_manila_mount_share_protocol`: Filesystem type to look up.  Currently 
-  supported options are `CEPHFS`.
-* `os_manila_mount_os_config_name`: Cloud config name (if applicable),
-  as defined in `/etc/openstack/clouds.yaml`
-
-If a Manila lookup has previously been performed and facts gathered, the
-following are required:
-
-* `os_manila_mount_host`: The server to contact for mounting the share.
-* `os_manila_mount_export`: The path on the server from which the share is exported.
-* `os_manila_mount_access_key`: The secret to use when mounting the share.
-
-Additional parameters are required in both cases:
-
-* `os_manila_mount_path`: Defaults to "/home/{{ os_manila_mount_user }}/ceph"
-
-A number of additional parameters are optional:
-
-* `os_manila_mount_user`: User name for which the mount point should be owned.
-* `os_manila_mount_group`: Group for which the mount point should be owned
-
-Ceph package repo and configuration options:
-
-* `os_manila_mount_pkgs_install`: Install repos and client packages needed for Ceph?
-  Defaults to `True`.
-* `os_manila_mount_ceph_repo_base`: Package repository to use.
-  Default is `http://download.ceph.com/rpm-luminous/el7`.
-* `os_manila_mount_ceph_repo_key`: Repo signing GPG key.
-  Default is `https://git.ceph.com/?p=ceph.git;a=blob_plain;f=keys/release.asc`
-* `os_manila_mount_ceph_conf_path`: Path to Ceph cluster configuration file.
-  Default is `/etc/ceph`.
-* `os_manila_mount_fuse`: Use a FUSE driver for the filesystem, if appropriate.
-  Default is `True`.
-
-
-Dependencies
-------------
-
-When mounting a Manila-orchestrated share in one step, this role depends on
-OpenStack configuration being placed at `/etc/openstack/clouds.yaml`
-One way to do that is using the role ``stackhpc.os-config``.
 
 Example Playbook
 ----------------
 
-This example pulls a few things together so you push the OpenStack config,
-and then mount a preexisting manila share:
+Note this role must be run with `become`.
 
     ---
     - hosts: all
+      become: yes
+      gather_facts: no
       vars:
-        my_cloud_config: |
-          ---
-          clouds:
-            mycloud:
-              auth:
-                auth_url: http://openstack.example.com:5000
-                project_name: p3
-                username: user
-                password: secretpassword
-              region: RegionOne
-      roles:
-        - { role: stackhpc.os-config,
-            os_config_content: "{{ my_cloud_config }}" }
-        - { role: stackhpc.os-manila-mount,
-            os_manila_mount_action: "lookup"
-            os_manila_mount_os_config_name: "mycloud",
-            os_manila_mount_share_name: my-share,
-            os_manila_mount_share_user: fakeuser }
+        os_manila_mount_shares:
+        - share_name: manila-test-share
+          share_user: testuser
+          mount_path: /mnt/manila
+          mount_user: "{{ ansible_user }}"
+          mount_group: "{{ ansible_user }}"
+      tasks:
+        - import_role:
+            name: stackhpc.os-manila-mount
 
-An easy way to this example is:
+An easy way to run this example with both the lookup and the mount done on localhost is:
 
-    sudo yum install python-virtualenv libselinux-python
-
-    virtualenv .venv --system-site-packages
+    python -m venv venv
     . .venv/bin/activate
     pip install -U pip
-    pip install -U ansible
+    pip install -U ansible python-openstackclient python-manilaclient
+    ansible-galaxy install stackhpc.os-manila-mount
 
-    ansible-galaxy install stackhpc.os-manila-mount \
-                           stackhpc.os-config
-
-    ansible-playbook -i "localhost," -c local test.yml
-
-A second example in which the querying of the OpenStack APIs is done once,
-from the local system. Note that password based authentication is used in this
-scenario. The group of nodes that mount the shared filesystem share the data
-returned:
-
-    ---
-    # Query OpenStack Manila for details aob
-    - hosts: localhost
-      roles:
-        - role: stackhpc.os-manila-mount
-          os_manila_mount_action: "lookup"
-          os_manila_mount_share_name: "HomeDirs"
-          os_manila_mount_share_user: "home"
-          os_manila_mount_auth_type: "password"
-          os_manila_mount_auth:
-            project_domain_name: fake-project-domain
-            user_domain_name: fake-user-domain
-            project_name: fake-project
-            username: fakeuser
-            password: fakepassword
-            auth_url: http://fake-auth-url
-
-    - hosts: cluster_ceph_client
-      roles:
-        # Perform the mount action on all Ceph client nodes
-        - role: stackhpc.os-manila-mount
-          os_manila_mount_action: "mount"
-          os_manila_mount_host: "{{ hostvars['localhost']['os_manila_mount_host'] }}"
-          os_manila_mount_access_key: "{{ hostvars['localhost']['os_manila_mount_access_key'] }}"
-          os_manila_mount_export: "{{ hostvars['localhost']['os_manila_mount_export'] }}"
-          os_manila_mount_share_user: "home"
-          os_manila_mount_pkgs_install: True
-          os_manila_mount_path: "/var/mnt/ceph"
-          os_manila_mount_user: "root"
-          os_manila_mount_group: "root"
-          os_manila_mount_fuse: True
-
+    ansible-playbook -v local test.yml
 
 License
 -------
