@@ -1,6 +1,6 @@
 ---
 # Perform a lookup if this module has not previously been invoked in that mode.
-- ansible.builtin.include: lookup.yml
+- ansible.builtin.include_tasks: lookup.yml
   when: not os_manila_mount_share_info | length
 
 - name: Ensure Ceph configuration directory exists

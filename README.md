@@ -13,6 +13,7 @@ Requirements
 
 The host running the lookup action (see below) requires the following python packages:
 
+- `openstacksdk`
 - `python-openstackclient`
 - `python-manilaclient`
 

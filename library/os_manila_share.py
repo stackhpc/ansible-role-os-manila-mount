@@ -26,7 +26,6 @@ def main():
     
     # the share object doesn't actually expose lots of stuff from the API, including the exports
     share_details = conn.share.get(f"/shares/{share.id}").json()['share']
-    # module.fail_json(share_details) # DEBUG
     protocol = share_details['share_proto'].upper()
     if protocol != 'CEPHFS':
         module.fail_json("Share named %r is protocol %r, can only handle CEPHFS" % (share_name, protocol))
@@ -55,10 +54,10 @@ def main():
     result['host'] = host
     result['export'] = export_path
     result['access_key'] = rule['access_key']
+    result['access_level'] = rule['access_level']
     result['share_user'] = rule['access_to'] # supports case where user is autodetected
     result['share_name'] = share_name
-    
-    # TODO: add more info here?
+
     module.exit_json(**result)
 
 if __name__ == '__main__':
