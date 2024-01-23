@@ -19,7 +19,8 @@ os_manila_mount_ceph_min_versions: # oldest-compatible distro versions:
     "8": nautilus
   Ubuntu:
     "22": reef # jammy
-os_manila_mount_ceph_version: "{{ os_manila_mount_ceph_min_versions[ansible_distribution][ansible_distribution_major_version] }}" # from octopus an x.y.z version can be specified instead
+os_manila_mount_ceph_version: "{{ os_manila_mount_ceph_min_versions[ansible_distribution][ansible_distribution_major_version] }}"
+# from octopus an x.y.z version can be specified instead
 os_manila_mount_ceph_repo_key: https://download.ceph.com/keys/release.asc
 os_manila_mount_ceph_release_repos:
   Rocky: "https://download.ceph.com/rpm-{{ os_manila_mount_ceph_version }}/el{{ ansible_distribution_major_version }}/\

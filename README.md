@@ -4,7 +4,7 @@ stackhpc.os-manila-mount
 Mount one or more shares created by OpenStack Manila.
 
 Currently only supports:
-- CephFS-protocol shares.
+- CephFS-protocol shares
 - Rocky 8
 - Ubuntu Jammy
 
