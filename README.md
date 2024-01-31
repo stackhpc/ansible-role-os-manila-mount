@@ -4,8 +4,9 @@ stackhpc.os-manila-mount
 Mount one or more shares created by OpenStack Manila.
 
 Currently only supports:
-- CephFS-protocol shares.
-- Enterprise Linux (RedHat clones) 8.
+- CephFS-protocol shares
+- Rocky 8
+- Ubuntu Jammy
 
 Requirements
 ------------
@@ -70,7 +71,7 @@ that, this should be a list of dicts each containing:
 `-v` will expose `access_key`.
 
 Ceph variables:
-* `os_manila_mount_ceph_version`: Optional. Ceph version string, default `nautilus`. From
+* `os_manila_mount_ceph_version`: Optional. Ceph version string. Default is the oldest supported by the hosts' distribution/version. From
   `octopus` alternatively an `x.y.z` version may be used.
 * `os_manila_mount_ceph_repo_key`: Optional. URL for Ceph repo key.
 * `os_manila_mount_ceph_release_repo`: Optional. URL for Ceph release repo.
