@@ -17,6 +17,7 @@ os_manila_mount_share_info: [] # populated by lookup mode
 os_manila_mount_ceph_min_versions: # oldest-compatible distro versions:
   Rocky:
     "8": nautilus
+    "9": reef # rpm-pacific/el9 directory is empty, rpm-quincy/el9/noarch doesn't have release rpm
   Ubuntu:
     "22": reef # jammy
 os_manila_mount_ceph_version: "{{ os_manila_mount_ceph_min_versions[ansible_distribution][ansible_distribution_major_version] }}"
