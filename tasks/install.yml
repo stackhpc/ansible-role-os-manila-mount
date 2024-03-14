@@ -24,6 +24,13 @@
         repo: "deb {{ os_manila_mount_ceph_release_repo }} {{ ansible_distribution_release }} main"
   when: ansible_distribution == 'Ubuntu'
 
+- name: Enable EPEL
+  dnf:
+    name: epel-release
+  when:
+    - ansible_distribution == 'Rocky'
+    - ansible_distribution_major_version == '9'
+
 - name: Install Ceph packages
   ansible.builtin.package:
     name: ceph-common

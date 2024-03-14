@@ -5,7 +5,7 @@ Mount one or more shares created by OpenStack Manila.
 
 Currently only supports:
 - CephFS-protocol shares
-- Rocky 8
+- RockyLinux 8 and 9
 - Ubuntu Jammy
 
 Requirements
