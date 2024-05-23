@@ -14,12 +14,13 @@ os_manila_mount_opts:
 os_manila_mount_share_info: [] # populated by lookup mode
 
 # CEPH specific defaults:
-os_manila_mount_ceph_min_versions: # oldest-compatible distro versions:
+os_manila_mount_ceph_min_versions: # default to oldest-available in for distro version:
+# see os_manila_mount_ceph_release_repos below for URLs to check
   Rocky:
-    "8": nautilus
-    "9": reef # rpm-pacific/el9 directory is empty, rpm-quincy/el9/noarch doesn't have release rpm
+    "8": '15.2.17' # octopus
+    "9": '17.2.7' # quincy
   Ubuntu:
-    "22": reef # jammy
+    "22": '17.2.7' # jammy: quincy
 os_manila_mount_ceph_version: "{{ os_manila_mount_ceph_min_versions[ansible_distribution][ansible_distribution_major_version] }}"
 # from octopus an x.y.z version can be specified instead
 os_manila_mount_ceph_repo_key: https://download.ceph.com/keys/release.asc
