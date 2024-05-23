@@ -23,7 +23,7 @@
         owner: root
         group: root
         mode: o=rw,go=r
-    
+
     - name: Install Ceph packages (dnf)
       dnf:
         name: "ceph-common == {{ os_manila_mount_ceph_version }}"
@@ -37,10 +37,10 @@
     - name: Install Ceph release repo (apt)
       ansible.builtin.apt_repository:
         repo: "deb {{ os_manila_mount_ceph_release_repo }} {{ ansible_distribution_release }} main"
-    
+
     - name: Install Ceph packages (apt)
       ansible.builtin.apt:
-        name: "ceph-common={{ os_manila_mount_ceph_version }}-1{{ ansible_distribution_release }}"
-        update_cache: yes
+        name: "ceph-common"
+        update_cache: true
 
   when: ansible_distribution == 'Ubuntu'

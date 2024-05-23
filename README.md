@@ -71,7 +71,7 @@ that, this should be a list of dicts each containing:
 `-v` will expose `access_key`.
 
 Ceph variables:
-* `os_manila_mount_ceph_version`: Optional. Ceph numerical version string, e.g. '17.2.7' not 'quincy'. Default is the oldest supported by the hosts' distribution/version. Must be 15.2.x (Octopus) or later.
+* `os_manila_mount_ceph_version`: Optional. Ceph numerical version string, e.g. '17.2.7' not 'quincy'. Default is the oldest supported by the hosts' distribution/version. Must be 15.2.x (Octopus) or later. Note that on RockyLinux changing this and rerunning the role can change the installed version, but on Ubuntu it cannot.
 * `os_manila_mount_ceph_repo_key`: Optional. URL for Ceph repo key.
 * `os_manila_mount_ceph_release_repo`: Optional. URL for Ceph release repo.
 * `os_manila_mount_ceph_conf_path`: Optional. Path for Ceph configuration directory,
