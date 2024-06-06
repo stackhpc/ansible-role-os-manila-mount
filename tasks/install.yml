@@ -26,7 +26,7 @@
 
     - name: Install Ceph packages (dnf)
       dnf:
-        name: "ceph-common == {{ os_manila_mount_ceph_version }}"
+        name: "ceph-common-{{ os_manila_mount_ceph_version }}"
   when: ansible_distribution == 'Rocky'
 
 - block:
