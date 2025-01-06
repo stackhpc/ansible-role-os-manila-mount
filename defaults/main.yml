@@ -30,3 +30,20 @@ os_manila_mount_ceph_release_repos:
   Ubuntu: "https://download.ceph.com/debian-{{ os_manila_mount_ceph_version }}/"
 os_manila_mount_ceph_release_repo: "{{ os_manila_mount_ceph_release_repos[ansible_distribution] }}"
 os_manila_mount_ceph_conf_path: /etc/ceph
+
+os_manila_mount_ceph_rpm_repos:
+  - name: Ceph
+    description: Ceph packages for $basearch
+    baseurl: "http://download.ceph.com/rpm-{{ os_manila_mount_ceph_version }}/el{{ ansible_distribution_major_version }}/$basearch"
+    enabled: true
+    gpgcheck: true
+  - name: Ceph-noarch
+    description: Ceph noarch packages
+    baseurl: "http://download.ceph.com/rpm-{{ os_manila_mount_ceph_version }}/el{{ ansible_distribution_major_version }}/noarch"
+    enabled: true
+    gpgcheck: true
+  - name: ceph-source
+    description: Ceph source packages
+    baseurl: "http://download.ceph.com/rpm-{{ os_manila_mount_ceph_version }}/el{{ ansible_distribution_major_version }}/SRPMS"
+    enabled: true
+    gpgcheck: true

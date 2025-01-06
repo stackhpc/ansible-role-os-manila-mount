@@ -17,12 +17,15 @@
         key: "{{ os_manila_mount_ceph_repo_key }}"
 
     - name: Create Ceph repofile
-      ansible.builtin.template:
-        src: ceph.repo.j2
-        dest: /etc/yum.repos.d/ceph.repo
-        owner: root
-        group: root
-        mode: o=rw,go=r
+      ansible.builtin.yum_repository:
+        name: "{{ item.name }}"
+        file: ceph
+        description: "{{ item.description }}"
+        baseurl: "{{ item.baseurl }}"
+        gpgcheck: "{{ item.gpgcheck }}"
+        gpgkey: "{{ os_manila_mount_ceph_repo_key }}"
+        enabled: "{{ item.enabled }}"
+      loop: "{{ os_manila_mount_ceph_rpm_repos }}"
 
     - name: Install Ceph packages (dnf)
       dnf:
