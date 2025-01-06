@@ -25,6 +25,7 @@
         gpgcheck: "{{ item.gpgcheck }}"
         gpgkey: "{{ os_manila_mount_ceph_repo_key }}"
         enabled: "{{ item.enabled }}"
+        mode: o=rw,go=r
       loop: "{{ os_manila_mount_ceph_rpm_repos }}"
 
     - name: Install Ceph packages (dnf)
