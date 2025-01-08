@@ -14,11 +14,10 @@ os_manila_mount_opts:
 os_manila_mount_share_info: [] # populated by lookup mode
 
 # CEPH specific defaults:
-os_manila_mount_ceph_min_versions: # default to oldest-available in for distro version:
-# see os_manila_mount_ceph_release_repos below for URLs to check
+os_manila_mount_ceph_min_versions:
   Rocky:
     "8": '17.2.7' # quincy
-    "9": '17.2.7' # quincy
+    "9": '18.2.4' # reef
   Ubuntu:
     "22": '17.2.7' # jammy: quincy
 os_manila_mount_ceph_version: "{{ os_manila_mount_ceph_min_versions[ansible_distribution][ansible_distribution_major_version] }}"
