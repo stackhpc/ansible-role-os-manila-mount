@@ -11,6 +11,7 @@ os_manila_mount_opts:
   - noatime
   - _netdev # prevents mount blocking early boot before networking available
   - rw
+  - "{{ os_manila_mount_share_info[0].mount_options | default('') }}" # Pass mount opts from manila
 os_manila_mount_share_info: [] # populated by lookup mode
 
 # CEPH specific defaults:
