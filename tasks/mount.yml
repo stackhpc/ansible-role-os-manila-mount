@@ -46,7 +46,7 @@
     path: "{{ item[0].mount_path }}"
     src: "{{ item[1].host }}:{{ item[1].export }}"
     fstype: ceph
-    opts: "name={{ item[1].share_user }},{{ (item[0].mount_opts | default(os_manila_mount_opts)) | join(',') }}"
+    opts: "name={{ item[1].share_user }},{{ item[1].mount_options | default('') }},{{ (item[0].mount_opts | default(os_manila_mount_opts)) | join(',') }}"
     # NB share_user is looked up here in case of autodetection
     state: "{{ item[0].mount_state | default(os_manila_mount_state) }}"
   loop: "{{ os_manila_mount_shares | zip(os_manila_mount_share_info) }}"
