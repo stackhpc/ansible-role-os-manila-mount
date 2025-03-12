@@ -11,6 +11,8 @@ os_manila_mount_opts:
   - noatime
   - _netdev # prevents mount blocking early boot before networking available
   - rw
+  - nodev
+  - nosuid
 os_manila_mount_share_info: [] # populated by lookup mode
 
 # CEPH specific defaults:
