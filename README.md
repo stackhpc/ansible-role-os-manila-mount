@@ -6,7 +6,7 @@ Mount one or more shares created by OpenStack Manila.
 Currently only supports:
 - CephFS-protocol shares
 - RockyLinux 8 and 9
-- Ubuntu Jammy
+- Ubuntu Jammy and Noble
 
 Requirements
 ------------
@@ -71,9 +71,9 @@ that, this should be a list of dicts each containing:
 `-v` will expose `access_key`.
 
 Ceph variables:
-* `os_manila_mount_ceph_version`: Optional. Ceph numerical version string, e.g. '17.2.7' not 'quincy'. Default is the oldest supported by the hosts' distribution/version. Must be 15.2.x (Octopus) or later. Note that on RockyLinux changing this and rerunning the role can change the installed version, but on Ubuntu it cannot.
-* `os_manila_mount_ceph_repo_key`: Optional. URL for Ceph repo key.
-* `os_manila_mount_ceph_release_repo`: Optional. URL for Ceph release repo.
+* `os_manila_mount_ceph_version`: Optional. Ceph numerical version string, e.g. '17.2.7' not 'quincy'. Default is the oldest supported by the hosts' distribution/version. Must be 15.2.x (Octopus) or later. Note that on RockyLinux changing this and rerunning the role can change the installed version, but on Ubuntu it cannot. After Ubuntu Jammy, this variable has no effect and the version of `ceph-common` available in the distribution repository is installed.
+* `os_manila_mount_ceph_repo_key`: Optional. URL for Ceph repo key. No effect after Ubuntu Jammy.
+* `os_manila_mount_ceph_release_repo`: Optional. URL for Ceph release repo. No effect after Ubuntu Jammy.
 * `os_manila_mount_ceph_conf_path`: Optional. Path for Ceph configuration directory,
 default `/etc/ceph`.
 
