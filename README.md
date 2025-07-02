@@ -76,6 +76,8 @@ Ceph variables:
 * `os_manila_mount_ceph_release_repo`: Optional. URL for Ceph release repo.
 * `os_manila_mount_ceph_conf_path`: Optional. Path for Ceph configuration directory,
 default `/etc/ceph`.
+* `os_manila_mount_fuse`: Use a FUSE driver for the filesystem, if appropriate.
+Default is `False`.
 
 
 Example Playbook

@@ -52,6 +52,23 @@
   loop: "{{ os_manila_mount_shares | zip(os_manila_mount_share_info) }}"
   loop_control:
     label: "{{ item[0].share_name }}"
+  when: not os_manila_mount_fuse | bool
+
+- name: FUSE-mount the Ceph share
+  ansible.posix.mount:
+    path: "{{ item[0].mount_path }}"
+    src: "none"
+    fstype: fuse.ceph
+    opts: "ceph.id={{ item[1].share_user }},\
+      ceph.conf={{ os_manila_mount_ceph_conf_path }}/ceph.conf,\
+      ceph.keyring={{ os_manila_mount_ceph_conf_path }}/ceph.client.{{ item[1].share_user }}.keyring,\
+      ceph.client-mountpoint={{ item[1].export }}"
+    # NB share_user is looked up here in case of autodetection
+    state: "{{ item[0].mount_state | default(os_manila_mount_state) }}"
+  loop: "{{ os_manila_mount_shares | zip(os_manila_mount_share_info) }}"
+  loop_control:
+    label: "{{ item[0].share_name }}"
+  when: os_manila_mount_fuse | bool
 
 - name: Ensure mounted directory has correct permissions
   ansible.builtin.file:
