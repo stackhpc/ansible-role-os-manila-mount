@@ -31,6 +31,12 @@
     - name: Install Ceph packages (dnf)
       dnf:
         name: "ceph-common-{{ os_manila_mount_ceph_version }}"
+
+    - name: Install ceph-fuse (dnf)
+      dnf:
+        name: "ceph-fuse"
+      when: os_manila_mount_fuse | bool
+
   when: ansible_distribution == 'Rocky'
 
 - block:
@@ -46,5 +52,10 @@
       ansible.builtin.apt:
         name: "ceph-common"
         update_cache: true
+
+    - name: Install ceph-fuse (apt)
+      ansible.builtin.apt:
+        name: "ceph-fuse"
+      when: os_manila_mount_fuse | bool
 
   when: ansible_distribution == 'Ubuntu'
