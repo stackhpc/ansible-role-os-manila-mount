@@ -48,3 +48,6 @@ os_manila_mount_ceph_rpm_repos:
     baseurl: "http://download.ceph.com/rpm-{{ os_manila_mount_ceph_version }}/el{{ ansible_distribution_major_version }}/SRPMS"
     enabled: true
     gpgcheck: true
+
+# Default to kernel FS driver over FUSE-mounting
+os_manila_mount_fuse: false
