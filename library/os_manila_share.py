@@ -50,6 +50,9 @@ def main():
             module.fail_json("Multiple rules found with 'access_to=%s' for share named %r" % (access_to, share_name))
         rule = rules[0]
 
+    # find mount options e.g. filesystem
+    mount_options = share_details.get('metadata', {}).get('__mount_options', '')
+
     # Put required parameters at top level in result to make loops easy:
     result['host'] = host
     result['export'] = export_path
@@ -57,6 +60,7 @@ def main():
     result['access_level'] = rule['access_level']
     result['share_user'] = rule['access_to'] # supports case where user is autodetected
     result['share_name'] = share_name
+    result['mount_options'] = mount_options
 
     module.exit_json(**result)
 

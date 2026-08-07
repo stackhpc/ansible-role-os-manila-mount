@@ -46,7 +46,7 @@ containing:
   - `mount_group`: Optional. Group to mount as (default: become user).
   - `mount_mode`: Optional. Permissions for mounted directory, as for [ansible.builtin.file:mode](https://docs.ansible.com/ansible/latest/collections/ansible/builtin/file_module.html#parameter-mode)
   - `mount_opts`: Optional. List of strings defining mount options. Default from
-  `os_manila_mount_opts` (i.e. same for all mounts).
+  `os_manila_mount_opts` (i.e. same for all mounts). Any mount options set via Manila are also used.
   - `mount_state`: Optional. Mount state, default from `os_manila_mount_state` (i.e. same for
   all mounts).
 
